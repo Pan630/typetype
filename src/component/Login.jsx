@@ -41,7 +41,7 @@ const Login = () => {
                 setErrorMessage("User data not found.");
             }
         } catch (error) {
-            console.error("Error during login:", error); // Debugging Error
+            // console.error("Error during login:", error); // Check Error
             switch (error.code) {
                 case "auth/invalid-email":
                     setErrorMessage("Invalid email address. Please check and try again.");

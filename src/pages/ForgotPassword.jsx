@@ -8,6 +8,7 @@ const ForgotPassword = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [isSending, setIsSending] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,9 +26,17 @@ const ForgotPassword = () => {
 
             setEmail(""); // Clear email field after success
         } catch (error) {
-            toast.error(error.message, {
-                position: "bottom-center",
-            });
+            // console.error("Error during login:", error); // Check Error
+            switch (error.code) {
+                case "auth/invalid-email":
+                    setErrorMessage("Invalid email address. Please check and try again.");
+                    break;
+                case "auth/user-not-found":
+                    setErrorMessage("No account found with this email. Please sign up first.");
+                    break;
+                default:
+                    setErrorMessage("We're unable to process your request right now. Please try again later.");
+            }
         } finally {
             setIsSending(false);
         }
@@ -42,7 +51,7 @@ const ForgotPassword = () => {
                 <p className="text-sm text-gray-600 text-center mb-6">
                     Enter your email address below, and we'll send you instructions to reset your password.
                 </p>
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form noValidate onSubmit={handleSubmit} className="space-y-5">
                     <div>
                         <label className="block text-sm text-gray-600 font-bold mb-1">
                             Email Address:
@@ -57,6 +66,9 @@ const ForgotPassword = () => {
                             className="w-full px-4 py-2 text-gray-700 bg-gray-50 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                         />
                     </div>
+                    {errorMessage && (
+                        <p className="text-red-600 text-sm font-medium text-center">{errorMessage}</p>
+                    )}
                     <button
                         type="submit"
                         disabled={isSending}
