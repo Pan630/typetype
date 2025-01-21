@@ -99,26 +99,28 @@ const TypingPractice = () => {
     }
 
     return (
-        <div className="max-w-[1240px] w-full h-screen mx-auto text-center flex-col justify-center my-10 md:px-10">
+        <div className="max-w-[1240px] w-full h-screen mx-auto text-center flex-col justify-center my-10 px-10">
             <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-800 ">Select a Letter to Practice</h1>
-            {loading ? (
-                <p className="text-lg font-semibold">Loading...</p>
-            ) : (errorLetters.length == 0 ? (
-                <p className="font-semibold text-xl mt-6">A <Link to="/TypingTest" className="text-[#375224] underline underline-offset-8">Typing test</Link> is required before you can continue.</p>
-            ) : (
-                <div className="grid grid-cols-6 gap-6 px-10">
-                    {errorLetters.map(({ char }) => (
-                        <button
-                            key={char}
-                            onClick={() => setSelectedLetter(char)}
-                            className={"p-2 rounded bg-[#476730] font-semibold text-2xl text-white"}
-                        >
-                            {char}
-                        </button>
-                    ))}
-                </div>
-            )
-            )}
+            <div className='place-self-center max-w-screen-lg w-full mx-5 ml-5 mr-5 p-6 rounded-lg border border-gray-300 bg-white shadow-md'>
+                {loading ? (
+                    <p className="text-lg font-semibold">Loading...</p>
+                ) : (errorLetters.length == 0 ? (
+                    <p className="font-semibold text-xl mt-6">A <Link to="/TypingTest" className="text-[#375224] underline underline-offset-8">Typing test</Link> is required before you can continue.</p>
+                ) : (
+                    <div className="grid grid-cols-6 gap-6 px-10">
+                        {errorLetters.map(({ char }) => (
+                            <button
+                                key={char}
+                                onClick={() => setSelectedLetter(char)}
+                                className={"p-2 rounded bg-[#476730] font-semibold text-2xl text-white"}
+                            >
+                                {char}
+                            </button>
+                        ))}
+                    </div>
+                )
+                )}
+            </div>
         </div>
     );
 };

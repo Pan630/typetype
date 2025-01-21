@@ -15,6 +15,7 @@ import TestHistory from './pages/TestHistory';
 import LearningProgress from './pages/LearningProgress';
 import AdminDashboard from './pages/AdminDashboard';
 import PreLesson from './pages/PreLesson';
+import SkipLessonTest from './pages/SkipLessonTest';
 
 import { AuthProvider } from './contexts/authProvider';
 import { ToastContainer } from "react-toastify";
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
       <Route path='/LearningProgress' element={<LearningProgress />} />
       <Route path='/AdminDashboard' element={<AdminDashboard />} />
       <Route path='/PreLesson' element={<PreLesson />} />
+      <Route path='/SkipLesson' element={<SkipLessonTest />} />
     </Route>
   )
 );

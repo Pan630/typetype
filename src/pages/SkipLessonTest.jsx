@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from "../contexts/authProvider";
-import { addDoc, doc, getDoc, collection, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from '../firebase/firebase';
 import { generate } from 'random-words';
 import { toast } from "react-toastify";
+import { IoMdArrowRoundBack } from "react-icons/io";
 import Keyboard from '../component/Keyboard';
+import { Link, useNavigate } from 'react-router-dom';
 
-const TypingTest = () => {
+const SkipLessonTest = () => {
     const { currentUser, userLoggedIn } = useAuth();
     const [userDetails, setUserDetails] = useState(null);
 
@@ -28,12 +30,12 @@ const TypingTest = () => {
         fetchUserData();
     }, [currentUser]);
 
+    const navigate = useNavigate();
     const maxTime = 60;
     const [timeLeft, setTimeLeft] = useState(maxTime);
     const [startTime, setStartTime] = useState(null);
     const [timeTaken, setTimeTaken] = useState(0);
     const [mistakes, setMistakes] = useState(0); //count mistakes
-    const [errorLetters, setErrorLetters] = useState({}); // collect mistake letters
     const [charIndex, setCharIndex] = useState(0);
     const [isTyping, setIsTyping] = useState(false);
     const [WPM, setWPM] = useState(0);
@@ -99,20 +101,6 @@ const TypingTest = () => {
         };
     }, [isTyping, timeLeft, startTime]);
 
-    const resetTest = () => {
-        setIsTyping(false);
-        setCharIndex(0);
-        setTimeLeft(maxTime);
-        setMistakes(0);
-        setWPM(0);
-        setAccuracy(0);
-        setParagraph(generateParagraph(50));
-        setErrorLetters({});
-        setCurrentTypeKey("");
-        setCorrectWrong([]);
-        inputRef.current.focus();
-    };
-
     const handleChange = (e) => {
         const typedChar = e.target.value.slice(-1);
         setCurrentTypeKey(typedChar);
@@ -126,12 +114,6 @@ const TypingTest = () => {
             if (typedChar !== paragraph[charIndex]) {
                 correctWrong[charIndex] = "wrong";
                 setMistakes(mistakes + 1);
-                if (paragraph[charIndex] !== ' ') {
-                    setErrorLetters(prev => ({ //prev to secure always get the latest value
-                        ...prev, // keep the all the data here
-                        [paragraph[charIndex]]: (prev[paragraph[charIndex]] || 0) + 1
-                    }));
-                }
             } else {
                 correctWrong[charIndex] = "correct";
             }
@@ -154,49 +136,76 @@ const TypingTest = () => {
         }
     };
 
-    //save test record
-    //async (function need to take sometimes to run)but it will not blocking the main program execution
-    const saveTestRecord = async () => {
-        if (!userLoggedIn) return; // Do nothing if the user is not login
-
-        const record = {
-            userId: currentUser.uid,
-            testTime: serverTimestamp(),
-            wpm: WPM,
-            accuracy: accuracy,
-            timeTaken: timeTaken,
-            totalLettersTyped: charIndex,
-            correctLetters: charIndex - mistakes,
-            incorrectLetters: mistakes,
-            errorLetters
-        };
+    const saveSkipRecord = async () => {
+        if (!currentUser) return;
 
         try {
-            await addDoc(collection(db, "TestResults"), record);
-            console.log("Typing test record saved successfully.");
+            const userDocRef = doc(db, "Users", currentUser.uid);
+            const lessonProgressRef = doc(db, "LessonProgress", currentUser.uid);
+
+            let updatedLevel = userDetails.level;
+            let lessonUpdates = {};
+            let updatedAt = serverTimestamp();
+
+            if (accuracy >= 95 && WPM >= 60) {
+                updatedLevel = "Advanced";
+                lessonUpdates = {
+                    lesson1: { status: "Skipped", updatedAt },
+                    lesson2: { status: "Skipped", updatedAt },
+                    lesson3: { status: "Skipped", updatedAt },
+                    lesson4: { status: "Skipped", updatedAt },
+                    lesson5: { status: "Skipped", updatedAt },
+                    lesson6: { status: "Skipped", updatedAt },
+                    lesson7: { status: "Skipped", updatedAt },
+                    lesson8: { status: "Skipped", updatedAt },
+                    lesson9: { status: "Skipped", updatedAt },
+                    lesson10: { status: "In Progress", updatedAt }
+                };
+            } else if (accuracy >= 90 && WPM >= 40) {
+                updatedLevel = "Intermediate";
+                lessonUpdates = {
+                    lesson1: { status: "Skipped", updatedAt },
+                    lesson2: { status: "Skipped", updatedAt },
+                    lesson3: { status: "Skipped", updatedAt },
+                    lesson4: { status: "Skipped", updatedAt },
+                    lesson5: { status: "Skipped", updatedAt },
+                    lesson6: { status: "Skipped", updatedAt },
+                    lesson7: { status: "In Progress", updatedAt }
+                };
+            }
+
+            await setDoc(
+                userDocRef,
+                {
+                    level: updatedLevel,
+                    updatedAt: serverTimestamp()
+                },
+                { merge: true }
+            );
+
+            await setDoc(
+                lessonProgressRef,
+                {
+                    ...lessonUpdates,
+                    updatedAt: serverTimestamp()
+                },
+                { merge: true }
+            );
+            toast.success("Skip lesson successfully!", {
+                position: "bottom-center",
+            });
         } catch (error) {
-            console.error("Error saving typing test record:", error);
+            console.error("Error saving test record:", error);
         }
     };
 
-    const clearPracticeRecords = async (userId) => {
-        const practiceRef = doc(db, "PracticeRecords", userId);
-
-        try {
-            // Delete the PracticeRecords document
-            await setDoc(practiceRef, {}, { merge: false }); // Update to empty document
-            console.log("PracticeRecords cleared successfully.");
-        } catch (error) {
-            console.error("Error clearing PracticeRecords:", error);
-        }
-    };
 
     useEffect(() => {
         if (timeLeft === 0 || (charIndex === totalLetters && charIndex > 0)) {
             setIsTyping(false);
             if (userLoggedIn) {
-                saveTestRecord(); // Save the record only if the user is logged in
-                clearPracticeRecords(currentUser.uid);
+                saveSkipRecord(); // Save the record only if the user is logged in
+
             }
         }
     }, [timeLeft, charIndex]);
@@ -206,31 +215,15 @@ const TypingTest = () => {
             <h1 className='text-4xl font-extrabold text-center mb-6 text-gray-800 '>Typing Test</h1>
             <div className='place-self-center max-w-screen-lg mx-5 ml-5 mr-5 p-6 rounded-lg border border-gray-300 bg-white shadow-md'>
                 <div className='font-semibold text-2xl flex justify-between items-center mb-5 pb-5 border-b-2 border-gray-600'>
-                    {/* total word select 
-                        <p className=' mx-auto px-4 text-black'>Select Word Count:
-                            <select
-                                id="wordCount"
-                                className='p-2 border border-gray-300 rounded-md'
-                                onChange={(e) => {
-                                    setParagraph(generateParagraph(Number(e.target.value)));
-                                    resetTest(); // Reset test when word count changes
-                                }}
-                            >
-                                <option value="50">50 Words</option>
-                                <option value="100">100 Words</option>
-                                <option value="200">200 Words</option>
-                            </select>
-                        </p> 
-                        */}
+                    <button
+                        className="flex items-center justify-center bg-[#476730] w-[50px] h-[50px] rounded-full text-white hover:bg-gray-700 transition-all"
+                        onClick={() => navigate("/TypingLesson")}
+                    >
+                        <IoMdArrowRoundBack className="text-2xl" />
+                    </button>
                     <p className=' mx-auto px-4 text-black'>Time Left: <strong className='px-1'>{timeLeft}s</strong></p>
-                    <p className=' mx-auto px-4 text-black'>Mistakes: <strong className='px-1'>{mistakes}</strong></p>
                     <p className=' mx-auto px-4 text-black'>WPM: <strong className='px-1'>{WPM}</strong></p>
                     <p className=' mx-auto px-4 text-black'>Accuracy: <strong className='px-1'>{accuracy}%</strong></p>
-                    <button
-                        className='bg-[#476730] font-semibold w-[150px] rounded-md mx-auto py-2 text-xl text-white items-center justify-between hover:bg-gray-700 transition-all '
-                        onClick={resetTest}>
-                        Try Again
-                    </button>
                 </div>
 
                 <div className='text-justify text-3xl' onClick={() => inputRef.current.focus()}>
@@ -258,32 +251,16 @@ const TypingTest = () => {
                 {(timeLeft === 0 || (charIndex === totalLetters && charIndex > 0)) && (
                     <div className='fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 animate-fade-in'>
                         <div className='bg-white p-6 rounded-lg shadow-lg text-center w-[90%] max-w-md'>
-                            <h2 className='text-2xl font-extrabold mb-4'>Typing Test Summary</h2>
+                            <h2 className='text-2xl font-extrabold mb-4'>Skip Lesson Test Summary</h2>
                             <p className='mb-2'><strong>WPM:</strong> {WPM}</p>
                             <p className='mb-2'><strong>Accuracy:</strong> {accuracy}%</p>
                             <p className='mb-2'><strong>Time Taken:</strong> {timeTaken}s</p>
-                            <p className='mb-2'><strong>Total Letters Typed:</strong> {charIndex}</p>
-                            <p className='mb-2'><strong>Correct Letters:</strong> {charIndex - mistakes}</p>
-                            <p className='mb-2'><strong>Mistake Letters:</strong> {mistakes}</p>
-                            {Object.keys(errorLetters).length > 0 && (
-                                <div className="mt-4">
-                                    <h3 className="font-bold">Error Characters:</h3>
-                                    <div className="font-semibold grid grid-cols-4 gap-2 mt-2">
-                                        {Object.entries(errorLetters).map(([char, count]) => (
-                                            <div key={char} className="flex justify-between p-2 bg-gray-100 rounded">
-                                                <span>{char}</span>
-                                                <span>({count}) error</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            <button
-                                className='font-semibold bg-[#476730] w-[150px] rounded-md mt-4 mx-auto py-2 text-xl text-white items-center justify-between hover:bg-gray-700 transition-all'
-                                onClick={resetTest}
+                            <Link
+                                to={'/TypingLesson'}
+                                className='font-semibold bg-[#476730] w-[150px] rounded-md mt-4 mx-auto py-2 px-4 text-xl text-white items-center justify-between hover:bg-gray-700 transition-all'
                             >
-                                Try Again
-                            </button>
+                                Back to Lesson
+                            </Link>
                         </div>
                     </div>
                 )}
@@ -293,4 +270,4 @@ const TypingTest = () => {
     );
 };
 
-export default TypingTest;
+export default SkipLessonTest;

@@ -60,6 +60,7 @@ const Register = () => {
             await setDoc(doc(db, "Users", user.uid), {
                 email: user.email,
                 userName: username,
+                level: "Beginner",
                 createdAt: serverTimestamp()
             });
 

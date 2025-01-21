@@ -1,6 +1,5 @@
-// Import necessary libraries
 import React, { useState, useEffect, useRef } from "react";
-import { faker } from '@faker-js/faker';
+import { generate } from "random-words";
 import { useAuth } from "../contexts/authProvider";
 import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from '../firebase/firebase';
@@ -36,6 +35,7 @@ const TypingGame = () => {
     const [correctWrong, setCorrectWrong] = useState([]);
     const [accuracy, setAccuracy] = useState(0);
     const [gameOver, setGameOver] = useState(false);
+    const [gameConquer, setGameConquer] = useState(false);
     const [lostLifeIndex, setLostLifeIndex] = useState(null);
 
     const inputRef = useRef(null);
@@ -47,16 +47,12 @@ const TypingGame = () => {
         resetGame();
     }, [mode]);
 
-    // Generate random word or paragraph
     const generateContent = () => {
         if (mode === "word") {
-            let word;
-            do {
-                word = faker.word.sample();
-            } while (word.length < 5);
+            const word = generate({ exactly: 1, minLength: 5 })[0];
             return word;
         } else if (mode === "paragraph") {
-            return Array.from({ length: 20 }, () => faker.word.sample()).join(" ");
+            return generate({ exactly: 20, join: " " });
         }
     };
 
@@ -65,7 +61,7 @@ const TypingGame = () => {
         const typedChar = e.target.value.slice(-1);
         const currentChar = charRefs.current[charIndex]?.textContent;
 
-        if (charIndex < content.length && lives > 0 && !gameOver) {
+        if (charIndex < content.length && lives > 0 && (!gameOver || !gameConquer)) {
             if (typedChar === currentChar) {
                 correctWrong[charIndex] = "correct";
             } else {
@@ -92,8 +88,11 @@ const TypingGame = () => {
     // Handle game end conditions
     const handleGameEnd = () => {
 
-        if (lives - 1 === 0 || level === 100) {
+        if (lives - 1 === 0) {
             setGameOver(true);
+        }
+        if (level === 3) {
+            setGameConquer(true);
         }
 
         setContent(generateContent());
@@ -101,16 +100,16 @@ const TypingGame = () => {
         setCharIndex(0);
         setMistakes(0);
 
-        if (accuracy >= 80 && level < 100) {
+        if (accuracy >= 80 && level < 3) {
             setLevel((prevLevel) => prevLevel + 1);
         } else {
-            setLostLifeIndex(lives - 1); // Trigger animation for lost life
+            setLostLifeIndex(lives - 1); // Track animation for lost life
             setTimeout(() => setLostLifeIndex(null), 300); // Reset animation index
             setLives((prevLives) => prevLives - 1);
         }
     };
 
-    // Reset game state
+    // Reset game
     const resetGame = () => {
         setLives(3);
         setLevel(1);
@@ -120,13 +119,16 @@ const TypingGame = () => {
         setCorrectWrong([]);
         setAccuracy(0);
         setGameOver(false);
+        setGameConquer(false);
         inputRef.current.focus();
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === 'Backspace') {
-            // Prevent backspace from doing anything
-            e.preventDefault();
+        if (e.key === 'Backspace' || e.key === 'ArrowLeft') {
+            e.preventDefault(); // Prevent backspace from doing anything
+            toast.info(`${e.key} is disabled during typing!`, {
+                position: "bottom-center",
+            });
         }
     };
 
@@ -150,12 +152,12 @@ const TypingGame = () => {
     };
 
     useEffect(() => {
-        if (gameOver) {
+        if (gameOver || gameConquer) {
             if (userLoggedIn) {
                 saveGameRecord(); // Save the record only if the user is logged in
             }
         }
-    }, [gameOver]);
+    }, [gameOver, gameConquer]);
 
     return (
         <div className='max-w-[1240px] w-full h-screen mx-auto text-center flex-col justify-center my-10 md:px-10' onKeyDown={handleKeyDown} tabIndex={0}>
@@ -220,24 +222,38 @@ const TypingGame = () => {
                     ))}
                 </div>
             </div>
-            {
-                gameOver && (
-                    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white p-6 rounded-lg shadow-lg text-center w-[90%] max-w-md">
-                            <h2 className="text-2xl font-extrabold mb-4">Game Over</h2>
-                            <p className="mb-2">
-                                <strong>Level reached:</strong> {level}
-                            </p>
-                            <button
-                                className="font-semibold bg-[#476730] w-[150px] rounded-md mx-auto py-2 text-white items-center justify-center hover:bg-gray-700"
-                                onClick={resetGame}
-                            >
-                                Start New Game
-                            </button>
-                        </div>
+            {gameOver && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg text-center w-[90%] max-w-md">
+                        <h2 className="text-2xl font-extrabold mb-4">Game Over</h2>
+                        <p className="mb-2">
+                            <strong>Level reached:</strong> {level}
+                        </p>
+                        <button
+                            className="font-semibold bg-[#476730] w-[150px] rounded-md mx-auto py-2 text-white items-center justify-center hover:bg-gray-700"
+                            onClick={resetGame}
+                        >
+                            Start New Game
+                        </button>
                     </div>
-                )
-            }
+                </div>
+            )}
+            {gameConquer && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg text-center w-[90%] max-w-md">
+                        <h2 className="text-2xl font-extrabold mb-4">You Has been Conquer the Game, Congratulations!</h2>
+                        <p className="mb-2">
+                            <strong>Level reached:</strong> {level}
+                        </p>
+                        <button
+                            className="font-semibold bg-[#476730] w-[150px] rounded-md mx-auto py-2 text-white items-center justify-center hover:bg-gray-700"
+                            onClick={resetGame}
+                        >
+                            Start New Game
+                        </button>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };

@@ -12,6 +12,7 @@ const UserProfile = () => {
   const hasNavigated = useRef(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [level, setLevel] = useState("");
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -28,6 +29,7 @@ const UserProfile = () => {
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             setUsername(docSnap.data().userName);
+            setLevel(docSnap.data().level);
           }
         }
       } catch (error) {
@@ -75,28 +77,28 @@ const UserProfile = () => {
     }
 
     if (newPassword !== newConfirmPassword) {
-      setErrorMessage("Passwords do not match.");
+      setErrorMessage("New password and confirm password do not match.");
       return;
     }
     try {
       const user = auth.currentUser;
-
-      // Reauthenticate user
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
 
-      // Update password
       await updatePassword(user, newPassword);
       toast.success("Password updated successfully!", { position: "top-center" });
-
-      // Close modal
       setIsPasswordModalOpen(false);
       setCurrentPassword("");
       setNewPassword("");
+      setErrorMessage("");
     } catch (error) {
-      console.error(error.message);
-      setErrorMessage(error.message);
-      toast.error("Failed to update password. Please try again.", { position: "top-center" });
+      switch (error.code) {
+        case "auth/wrong-password":
+          setErrorMessage("Current password is incorrect. Please try again.");
+          break;
+        default:
+          setErrorMessage("Failed to update password. Please try again.");
+      }
     }
   };
 
@@ -112,6 +114,10 @@ const UserProfile = () => {
           <label className="block font-bold text-lg text-gray-600">Email:</label>
           <p className="text-gray-800 text-lg">{email}</p>
         </div>
+        <div className="mb-4">
+          <label className="block font-bold text-lg text-gray-600">Level:</label>
+          <p className="text-gray-800 text-lg">{level}</p>
+        </div>
         <button
           onClick={() => setIsPasswordModalOpen(true)}
           className="font-semibold px-4 py-2 transition duration-300 ease-in-out bg-[#476730] hover:bg-[#3e5825] text-white rounded-md"
@@ -124,7 +130,7 @@ const UserProfile = () => {
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-md p-6 max-w-md w-full">
             <h2 className="text-2xl font-extrabold mb-4">Change Password</h2>
-            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+            <form noValidate onSubmit={handlePasswordUpdate} className="space-y-4">
               <div>
                 <label className="block font-bold text-lg text-gray-600">Current Password:</label>
                 <input
@@ -149,6 +155,7 @@ const UserProfile = () => {
                 />
               </div>
               <div className="text-md">
+                <p className="font-bold text-gray-600">Password Requirement:</p>
                 <p className={isMinLength ? "text-green-600" : "text-gray-600 font-semibold"}>
                   • At least 8 characters
                 </p>
@@ -172,13 +179,18 @@ const UserProfile = () => {
                   className="w-full px-4 py-2 text-gray-700 bg-gray-50 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
               </div>
+
               {errorMessage && (
-                <p className="text-red-600 text-sm">{errorMessage}</p>
+                <p className="text-red-600 text-sm font-medium">{errorMessage}</p>
               )}
+
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"
-                  onClick={() => setIsPasswordModalOpen(false)}
+                  onClick={() => {
+                    setIsPasswordModalOpen(false);
+                    setErrorMessage("");
+                  }}
                   className="font-semibold px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                 >
                   Cancel

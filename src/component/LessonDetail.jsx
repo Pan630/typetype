@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/authProvider";
 import { fetchLessons, updateLessonProgress } from "../contexts/lessonService";
 import { Link, useNavigate } from "react-router-dom";
+import { IoMdArrowRoundBack } from "react-icons/io";
 import Keyboard from "./Keyboard";
 
 const LessonDetail = () => {
@@ -97,6 +98,7 @@ const LessonDetail = () => {
         setCorrectWrong([]);
         inputRef.current.focus();
     };
+
     const handleNext = () => {
         navigate(`/lesson/${nextLessonId}`);
         setCharIndex(0);
@@ -118,9 +120,23 @@ const LessonDetail = () => {
         }
     };
     return (
-        <div className='max-w-[1240px] w-full h-screen mx-auto text-center flex-col justify-center my-10 px-10' onKeyDown={handleKeyDown} tabIndex={0}>
-            <h1 className='text-4xl font-extrabold text-center mb-6 text-gray-800'>Typing Lesson {lessonId}</h1>
+        <div className='max-w-[1240px] w-full mx-auto text-center flex-col justify-center my-10 px-10' onKeyDown={handleKeyDown} tabIndex={0}>
             <div className='place-self-center max-w-screen-lg mx-5 ml-5 mr-5 p-6 rounded-lg border border-gray-300 bg-white shadow-md space-y-4'>
+                <div className="font-semibold text-2xl flex justify-between items-center mb-5 pb-5 border-b-2 border-gray-600">
+                    <button
+                        className="flex items-center justify-center bg-[#476730] w-[50px] h-[50px] rounded-full text-white hover:bg-gray-700 transition-all"
+                        onClick={() => navigate("/TypingLesson")}
+                    >
+                        <IoMdArrowRoundBack className="text-2xl" />
+                    </button>
+                    <h1 className='text-4xl font-extrabold text-center mx-6 text-gray-800'>Typing Lesson {lessonId}</h1>
+                    <button
+                        className="bg-[#476730] px-4 py-2 rounded-md text-white text-xl hover:bg-gray-700 transition-all"
+                        onClick={handleRedo}
+                    >
+                        Redo
+                    </button>
+                </div>
                 <div className="text-justify" onClick={() => inputRef.current.focus()}>
                     <input
                         type="text"
@@ -143,12 +159,12 @@ const LessonDetail = () => {
                             </span>
                         ))
                     ) : (
-                        <p className="text-gray-500">Loading lesson content...</p>
+                        <p className="text-lg font-semibold">Loading lesson content...</p>
                     )}
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
-                        className="bg-blue-500 h-3 rounded-full transition-all duration-300"
+                        className="bg-[#476730] h-3 rounded-full transition-all duration-300"
                         style={{ width: `${(charIndex / totalLetters) * 100}%` }}
                     ></div>
                 </div>

@@ -103,7 +103,7 @@ const PracticeLetter = ({ letter, onComplete, onBack }) => {
     };
 
     return (
-        <div className='max-w-[1240px] w-full h-screen mx-auto text-center flex-col justify-center md:px-10' onKeyDown={handleKeyDown} tabIndex={0}>
+        <div className='max-w-[1240px] w-full mx-auto text-center flex-col justify-center md:px-10' onKeyDown={handleKeyDown} tabIndex={0}>
             <h2 className="text-4xl font-extrabold m-6">Practice letter of [{letter}]</h2>
             <div className='place-self-center max-w-screen-lg mx-5 ml-5 mr-5 p-6 rounded-lg border border-gray-300 bg-white shadow-md'>
                 <div className="font-semibold text-2xl flex justify-between items-center mb-5 pb-5 border-b-2 border-gray-600">
@@ -113,7 +113,7 @@ const PracticeLetter = ({ letter, onComplete, onBack }) => {
                     >
                         <IoMdArrowRoundBack className="text-2xl" />
                     </button>
-                    <p p className="mx-auto px-4">Accuracy: <span className={`${accuracy >= 95 ? "text-green-600" : "text-red-600"}`}>{accuracy}%</span></p>
+                    <p className="mx-auto px-4">Accuracy: <span className={`${accuracy >= 95 ? "text-green-600" : "text-red-600"}`}>{accuracy}%</span></p>
                     <button
                         className="bg-[#476730] px-4 py-2 rounded-md text-white text-xl hover:bg-gray-700 transition-all"
                         onClick={resetPractice}
