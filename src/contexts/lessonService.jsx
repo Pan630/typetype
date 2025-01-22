@@ -35,12 +35,26 @@ export const fetchLessonProgress = async (userId) => {
 export const updateLessonProgress = async (userId, lessonId, acc, wpm, totalTime, nextLessonId) => {
     const progressCollection = collection(db, "LessonProgress");
     const progressRef = doc(progressCollection, userId);
-    // Check got user lesson progress data
+
+    // Fetch user progress document
     const progressSnapshot = await getDoc(progressRef);
 
-    // No have progress data
+    let accuracyThreshold = 80;
+    let wpmThreshold = 0;
+
+    if (lessonId >= 7 && lessonId <= 9) {
+        accuracyThreshold = 90;
+        wpmThreshold = 40;
+    } else if (lessonId >= 10 && lessonId <= 12) {
+        accuracyThreshold = 95;
+        wpmThreshold = 60;
+    }
+
+    const isComplete = acc >= accuracyThreshold && wpm >= wpmThreshold;
+
+    // If not have progress data
     if (!progressSnapshot.exists()) {
-        if (acc >= 80) {
+        if (isComplete) {
             await setDoc(progressRef, {
                 [`lesson${lessonId}`]: {
                     status: "Complete",
@@ -60,8 +74,7 @@ export const updateLessonProgress = async (userId, lessonId, acc, wpm, totalTime
                 },
                 updatedAt: serverTimestamp(),
             });
-        }
-        else {
+        } else {
             await setDoc(progressRef, {
                 [`lesson${lessonId}`]: {
                     status: "In Progress",
@@ -74,47 +87,48 @@ export const updateLessonProgress = async (userId, lessonId, acc, wpm, totalTime
                 updatedAt: serverTimestamp(),
             });
         }
-
-    } else { // Got progress data
-        // If redo complete lesson
+    } else {
+        // Already got progress data
         const data = progressSnapshot.data();
         const lessonProgress = data[`lesson${lessonId}`];
-        if (lessonProgress.status === "Complete") {
-            if (acc >= 80) {
-                await updateDoc(progressRef, {
-                    [`lesson${lessonId}`]: {
-                        status: "Complete",
-                        accuracy: acc,
-                        wpm: wpm,
-                        timeTaken: totalTime,
-                        dateCompleted: lessonProgress.dateCompleted,
-                        updatedAt: serverTimestamp(),
-                    },
-                    updatedAt: serverTimestamp(),
-                })
-            }
-        }
-        else {
+
+        // redo lesson
+        if (lessonProgress?.status === "Complete") {
             await updateDoc(progressRef, {
                 [`lesson${lessonId}`]: {
-                    status: acc >= 80 ? "Complete" : "In Progress",
+                    ...lessonProgress,
                     accuracy: acc,
                     wpm: wpm,
                     timeTaken: totalTime,
-                    dateCompleted: acc >= 80 ? serverTimestamp() : null,
                     updatedAt: serverTimestamp(),
                 },
+                updatedAt: serverTimestamp(),
+            });
+        } else {
+            const updateData = {
+                [`lesson${lessonId}`]: {
+                    status: isComplete ? "Complete" : "In Progress",
+                    accuracy: acc,
+                    wpm: wpm,
+                    timeTaken: totalTime,
+                    dateCompleted: isComplete ? serverTimestamp() : null,
+                    updatedAt: serverTimestamp(),
+                },
+                updatedAt: serverTimestamp(),
+            };
 
-                [`lesson${nextLessonId}`]: {
+            if (isComplete) {
+                updateData[`lesson${nextLessonId}`] = {
                     status: "In Progress",
                     accuracy: null,
                     wpm: null,
                     timeTaken: null,
                     dateCompleted: null,
                     updatedAt: serverTimestamp(),
-                },
-                updatedAt: serverTimestamp(),
-            });
+                };
+            }
+
+            await updateDoc(progressRef, updateData);
         }
     }
-}
+};

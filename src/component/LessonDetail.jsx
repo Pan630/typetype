@@ -77,7 +77,17 @@ const LessonDetail = () => {
         setWPM(wpm);
         setAccuracy(accuracy);
         setIsLessonComplete(true);
-        updateLessonProgress(currentUser.uid, lessonId, accuracy, wpm, totalTime, nextLessonId)
+
+        let isComplete = false;
+        if (lessonLevel === "Intermediate") {
+            isComplete = accuracy >= 90 && wpm >= 40;
+        } else if (lessonLevel === "Advanced") {
+            isComplete = accuracy >= 95 && wpm >= 60;
+        } else {
+            isComplete = accuracy >= 80;
+        }
+
+        updateLessonProgress(currentUser.uid, lessonId, accuracy, wpm, totalTime, isComplete ? nextLessonId : null);
     };
 
     const calculateMetrics = (charsTyped, mistakes, startTime) => {
@@ -184,7 +194,9 @@ const LessonDetail = () => {
                                 >
                                     Back to Lesson
                                 </Link>
-                                {accuracy >= 80 ? (
+                                {(lessonLevel === "Intermediate" && accuracy >= 90 && WPM >= 40) ||
+                                    (lessonLevel === "Advanced" && accuracy >= 95 && WPM >= 60) ||
+                                    (lessonLevel !== "Intermediate" && lessonLevel !== "Advanced" && accuracy >= 80) ? (
                                     <button
                                         className="px-4 py-2 mx-auto transition duration-300 ease-in-out bg-[#476730] hover:bg-[#3e5825] w-[150px] text-xl text-white rounded-md"
                                         onClick={handleNext}
@@ -199,6 +211,7 @@ const LessonDetail = () => {
                                         Retry
                                     </button>
                                 )}
+
                             </div>
                         </div>
                     </div>

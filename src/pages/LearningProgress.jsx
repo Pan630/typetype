@@ -187,7 +187,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import LineChart from "../component/LineChart";
 import { db } from "../firebase/firebase";
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, where, orderBy, getDocs, doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/authProvider";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -234,36 +234,42 @@ const LearningProgress = () => {
 
                 setProgressData(testData);
 
-                // Fetch lesson progress data
                 const lessonProgressRef = collection(db, "LessonProgress");
-                const lessonQuery = query(lessonProgressRef, where("userId", "==", userId));
-                const lessonSnapshot = await getDocs(lessonQuery);
+                const userDoc = await getDocs(query(lessonProgressRef, where("__name__", "==", userId)));
 
-                const lessonData = lessonSnapshot.docs.map((doc) => {
-                    const data = doc.data();
+                if (userDoc.empty) {
+                    console.error("No lesson progress data found for user:", userId);
+                    setLessonData([]);
+                    return;
+                }
 
-                    return Object.keys(data).map((lessonKey) => {
-                        const lesson = data[lessonKey];
-                        if (lesson.dateCompleted) {
-                            const lessonDate = new Date(lesson.dateCompleted.seconds * 1000);
+                const docData = userDoc.docs[0].data(); // Get the data from the user's document
 
-                            const formattedDate = `${String(lessonDate.getDate()).padStart(2, "0")}/${String(
-                                lessonDate.getMonth() + 1
-                            ).padStart(2, "0")}/${lessonDate.getFullYear()}`;
+                // Process lesson data
+                const lessonData = Object.entries(docData)
+                    .filter(([key, lesson]) =>
+                        key.startsWith("lesson") && // Ensure the key is a lesson
+                        lesson.status === "Complete" && // Include only completed lessons
+                        lesson.dateCompleted // Ensure the lesson has a completion date
+                    )
+                    .map(([lessonKey, lesson]) => {
+                        const lessonDate = new Date(lesson.dateCompleted.seconds * 1000);
 
-                            return {
-                                date: formattedDate,
-                                dateObj: lessonDate,
-                                wpm: lesson.wpm || 0,
-                                accuracy: lesson.accuracy || 0,
-                                lesson: lessonKey,
-                            };
-                        }
-                        return null;
-                    }).filter(Boolean);
-                }).flat();
+                        const formattedDate = `${String(lessonDate.getDate()).padStart(2, "0")}/${String(
+                            lessonDate.getMonth() + 1
+                        ).padStart(2, "0")}/${lessonDate.getFullYear()}`;
+
+                        return {
+                            date: formattedDate,
+                            dateObj: lessonDate,
+                            wpm: lesson.wpm || 0,
+                            accuracy: lesson.accuracy || 0,
+                            lesson: lessonKey,
+                        };
+                    });
 
                 setLessonData(lessonData);
+
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
@@ -322,7 +328,6 @@ const LearningProgress = () => {
         <div className="max-w-[1240px] w-full mx-auto text-center my-10 px-10">
             <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-800">Learning Progress</h1>
 
-            {/* Toggle between Test and Lesson views */}
             <div className="flex justify-center mb-6">
                 <button
                     className={`font-semibold px-4 py-2 mx-2 rounded-md ${view === "test" ? "bg-[#476730] text-white" : "bg-gray-300 text-gray-800"}`}
@@ -343,12 +348,12 @@ const LearningProgress = () => {
                     <button
                         key={filter}
                         className={`font-semibold px-4 py-2 rounded-md transition-all duration-300 ease-in-out ${timeRange.start.toDateString() ===
-                                new Date(new Date().setDate(new Date().getDate() - (filter === "week" ? 7 : 0))).toDateString() &&
-                                filter === "today"
+                            new Date(new Date().setDate(new Date().getDate() - (filter === "week" ? 7 : 0))).toDateString() &&
+                            filter === "today"
+                            ? "bg-[#476730] text-white shadow-md"
+                            : filter === "all" && timeRange.start.getTime() === 0
                                 ? "bg-[#476730] text-white shadow-md"
-                                : filter === "all" && timeRange.start.getTime() === 0
-                                    ? "bg-[#476730] text-white shadow-md"
-                                    : "bg-gray-300 text-gray-800 hover:bg-[#476730] hover:text-white"
+                                : "bg-gray-300 text-gray-800 hover:bg-[#476730] hover:text-white"
                             }`}
                         onClick={() => setPresetTimeRange(filter)}
                     >
