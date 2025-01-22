@@ -161,6 +161,9 @@ const SkipLessonTest = () => {
                     lesson9: { status: "Skipped", updatedAt },
                     lesson10: { status: "In Progress", updatedAt }
                 };
+                toast.success("Skip lesson successfully!", {
+                    position: "bottom-center",
+                });
             } else if (accuracy >= 90 && WPM >= 40) {
                 updatedLevel = "Intermediate";
                 lessonUpdates = {
@@ -172,13 +175,19 @@ const SkipLessonTest = () => {
                     lesson6: { status: "Skipped", updatedAt },
                     lesson7: { status: "In Progress", updatedAt }
                 };
+                toast.success("Skip lesson successfully!", {
+                    position: "bottom-center",
+                });
+            } else {
+                toast.error("Skip lesson fail!", {
+                    position: "bottom-center",
+                });
             }
 
             await setDoc(
                 userDocRef,
                 {
                     level: updatedLevel,
-                    updatedAt: serverTimestamp()
                 },
                 { merge: true }
             );
@@ -191,9 +200,6 @@ const SkipLessonTest = () => {
                 },
                 { merge: true }
             );
-            toast.success("Skip lesson successfully!", {
-                position: "bottom-center",
-            });
         } catch (error) {
             console.error("Error saving test record:", error);
         }
@@ -212,7 +218,7 @@ const SkipLessonTest = () => {
 
     return (
         <div className='max-w-[1240px] w-full mx-auto text-center flex-col justify-center my-10 px-10' onKeyDown={handleKeyDown} tabIndex={0}>
-            <h1 className='text-4xl font-extrabold text-center mb-6 text-gray-800 '>Typing Test</h1>
+            <h1 className='text-4xl font-extrabold text-center mb-6 text-gray-800 '>Skip Lesson Test</h1>
             <div className='place-self-center max-w-screen-lg mx-5 ml-5 mr-5 p-6 rounded-lg border border-gray-300 bg-white shadow-md'>
                 <div className='font-semibold text-2xl flex justify-between items-center mb-5 pb-5 border-b-2 border-gray-600'>
                     <button

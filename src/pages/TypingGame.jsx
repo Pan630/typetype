@@ -91,7 +91,7 @@ const TypingGame = () => {
         if (lives - 1 === 0) {
             setGameOver(true);
         }
-        if (level === 3) {
+        if (level === 100) {
             setGameConquer(true);
         }
 
@@ -100,7 +100,7 @@ const TypingGame = () => {
         setCharIndex(0);
         setMistakes(0);
 
-        if (accuracy >= 80 && level < 3) {
+        if (accuracy >= 80 && level < 100) {
             setLevel((prevLevel) => prevLevel + 1);
         } else {
             setLostLifeIndex(lives - 1); // Track animation for lost life
@@ -223,7 +223,7 @@ const TypingGame = () => {
                 </div>
             </div>
             {gameOver && (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
                     <div className="bg-white p-6 rounded-lg shadow-lg text-center w-[90%] max-w-md">
                         <h2 className="text-2xl font-extrabold mb-4">Game Over</h2>
                         <p className="mb-2">

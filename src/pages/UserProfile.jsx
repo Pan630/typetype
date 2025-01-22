@@ -127,7 +127,7 @@ const UserProfile = () => {
       </div>
 
       {isPasswordModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
           <div className="bg-white rounded-lg shadow-md p-6 max-w-md w-full">
             <h2 className="text-2xl font-extrabold mb-4">Change Password</h2>
             <form noValidate onSubmit={handlePasswordUpdate} className="space-y-4">

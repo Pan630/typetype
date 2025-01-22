@@ -144,7 +144,7 @@ const PracticeLetter = ({ letter, onComplete, onBack }) => {
                 </div>
             </div>
             {isPracticeEnd && (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
                     <div className="bg-white p-6 rounded-lg shadow-lg text-center w-[90%] max-w-md">
                         <h2 className="text-2xl font-extrabold mb-4">Practice Summary</h2>
                         <p className="mb-2"><strong>Accuracy:</strong> {accuracy}%</p>

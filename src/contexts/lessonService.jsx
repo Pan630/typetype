@@ -131,4 +131,21 @@ export const updateLessonProgress = async (userId, lessonId, acc, wpm, totalTime
             await updateDoc(progressRef, updateData);
         }
     }
+    const usersCollection = collection(db, "Users");
+    const userRef = doc(usersCollection, userId);
+
+    // Update user level
+    if (lessonId === 10 && acc >= 95 && wpm >= 60) {
+        if (userData.level !== "Advanced") {
+            await setDoc(userRef, {
+                level: "Advanced",
+            }, { merge: true });
+        }
+    } else if (lessonId === 7 && acc >= 90 && wpm >= 40) {
+        if (userData.level !== "Intermediate") {
+            await setDoc(userRef, {
+                level: "Intermediate",
+            }, { merge: true });
+        }
+    }
 };

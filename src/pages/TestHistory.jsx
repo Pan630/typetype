@@ -154,7 +154,7 @@ const TestHistory = () => {
                     </div>
 
                     {selectedResult && (
-                        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+                        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
                             <div className="bg-white p-6 rounded-md shadow-lg max-w-md w-full">
                                 <h2 className="text-2xl font-extrabold mb-4">Test Details</h2>
                                 <p className='text-lg py-2'><strong>Completed At:</strong> {new Date(selectedResult.testTime.seconds * 1000).toLocaleString()}</p>

@@ -34,9 +34,7 @@ const LearningProgress = () => {
                     const data = doc.data();
                     const testTime = new Date(data.testTime.seconds * 1000);
 
-                    const formattedDate = `${String(testTime.getDate()).padStart(2, "0")}/${String(
-                        testTime.getMonth() + 1
-                    ).padStart(2, "0")}/${testTime.getFullYear()}`;
+                    const formattedDate = `${String(testTime.getDate()).padStart(2, "0")}/${String(testTime.getMonth() + 1).padStart(2, "0")}/${testTime.getFullYear()}`;
 
                     return {
                         date: formattedDate,
@@ -51,27 +49,19 @@ const LearningProgress = () => {
                 const lessonProgressRef = collection(db, "LessonProgress");
                 const userDoc = await getDocs(query(lessonProgressRef, where("__name__", "==", userId)));
 
-                if (userDoc.empty) {
-                    console.error("No lesson progress data found for user:", userId);
-                    setLessonData([]);
-                    return;
-                }
-
-                const docData = userDoc.docs[0].data(); // Get the data from the user's document
+                const docData = userDoc.docs[0].data();
 
                 // Process lesson data
                 const lessonData = Object.entries(docData)
                     .filter(([key, lesson]) =>
-                        key.startsWith("lesson") && // Ensure the key is a lesson
-                        lesson.status === "Complete" && // Include only completed lessons
-                        lesson.dateCompleted // Ensure the lesson has a completion date
+                        key.startsWith("lesson") &&
+                        lesson.status === "Complete" && // Only need complete lessons data
+                        lesson.dateCompleted
                     )
                     .map(([lessonKey, lesson]) => {
                         const lessonDate = new Date(lesson.dateCompleted.seconds * 1000);
 
-                        const formattedDate = `${String(lessonDate.getDate()).padStart(2, "0")}/${String(
-                            lessonDate.getMonth() + 1
-                        ).padStart(2, "0")}/${lessonDate.getFullYear()}`;
+                        const formattedDate = `${String(lessonDate.getDate()).padStart(2, "0")}/${String(lessonDate.getMonth() + 1).padStart(2, "0")}/${lessonDate.getFullYear()}`;
 
                         return {
                             date: formattedDate,
@@ -80,7 +70,8 @@ const LearningProgress = () => {
                             accuracy: lesson.accuracy || 0,
                             lesson: lessonKey,
                         };
-                    });
+                    })
+                    .sort((a, b) => a.dateObj - b.dateObj);
 
                 setLessonData(lessonData);
 

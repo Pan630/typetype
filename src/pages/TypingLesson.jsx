@@ -83,7 +83,7 @@ const TypingLesson = () => {
         const lessonId = lesson.id;
 
         if (!progress) {
-            if (lessonId === 1) {
+            if (lessonId === "1") {
                 return {
                     status: "In progress",
                     className: "cursor-pointer bg-blue-100 border-blue-500 hover:shadow-lg"
@@ -112,7 +112,7 @@ const TypingLesson = () => {
             };
         }
 
-        if (lessonId === 1 || (lessonProgress && lessonProgress.status === "In Progress")) {
+        if (lessonId === "1" || (lessonProgress && lessonProgress.status === "In Progress")) {
             return {
                 status: "In progress",
                 className: "cursor-pointer bg-blue-100 border-blue-500 hover:shadow-lg"
