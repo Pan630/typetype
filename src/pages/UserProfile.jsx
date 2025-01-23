@@ -71,8 +71,17 @@ const UserProfile = () => {
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
 
+    if (
+      [currentPassword, newPassword, newConfirmPassword].some( //.some method to check if the field in the array is empty or contain only space.
+        (field) => field.trim() === ""
+      )
+    ) {
+      setErrorMessage("All fields are required and cannot be empty.");
+      return;
+    }
+
     if (!isMinLength || !hasUppercase || !hasLowercase || !hasSpecialChar) {
-      setErrorMessage("Password does not meet the required criteria.");
+      setErrorMessage("New password does not meet the requirement.");
       return;
     }
 
@@ -80,6 +89,7 @@ const UserProfile = () => {
       setErrorMessage("New password and confirm password do not match.");
       return;
     }
+
     try {
       const user = auth.currentUser;
       const credential = EmailAuthProvider.credential(user.email, currentPassword);

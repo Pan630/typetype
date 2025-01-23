@@ -3,6 +3,7 @@ import { generate } from "random-words";
 import { useAuth } from "../contexts/authProvider";
 import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from '../firebase/firebase';
+import { toast } from "react-toastify";
 
 const TypingGame = () => {
     const { currentUser, userLoggedIn } = useAuth();

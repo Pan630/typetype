@@ -42,7 +42,7 @@ const Register = () => {
         e.preventDefault();
         setIsSignUp(true);
         if (!isMinLength || !hasUppercase || !hasLowercase || !hasSpecialChar) {
-            setErrorMessage("Password does not meet the required criteria.");
+            setErrorMessage("Password does not meet the requirement.");
             setIsSignUp(false);
             return;
         }
