@@ -138,7 +138,7 @@ const TypingLesson = () => {
             return groups;
         }, {});
 
-        // Define the desired order of levels
+        // Define the order of levels
         const levelOrder = ["Beginner", "Intermediate", "Advanced"];
 
         return levelOrder.map((level) => {
