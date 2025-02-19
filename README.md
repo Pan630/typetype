@@ -27,4 +27,4 @@ cd repository-name
 
 # Installing Dependencies
 After cloning the project, install the required dependencies:
-npm install
+```npm install
