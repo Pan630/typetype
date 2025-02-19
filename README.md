@@ -67,7 +67,7 @@ npm install
 
 3.  Obtain the backup data:
 
-    *   Download the `firestore_data.json` backup file from Google Drive(https://drive.google.com/file/d/1_AUgm79TxTELl9YRQL3EFea7zldaYWu8/view?usp=sharing).
+    *   Download the `firestore_data.json` backup file from Google Drive(https://drive.google.com/file/d/1Fe19p2rwHx6SeiMGBSe4fxR6EWzJsOYE/view?usp=sharing).
 
 4.  Run the restore script:
 
