@@ -60,13 +60,10 @@ npm install
 ### Firestore Restore Instructions
 
 1.  Set up your Firebase project:
+    *   Go to Firebase Project Setting > Service accounts; create a service account and download the service account key JSON file (`serviceAccountKey.json`).
 
-    *   Create a service account and download the service account key JSON file (`serviceAccountKey.json`).
-
-2.  Set the environment variable:
-
-    *   Linux/macOS: `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/firestore/serviceAccountKey.json"`
-    *   Windows: `set GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\your\firestore\serviceAccountKey.json"`
+2. Place the `serviceAccountKey.json` file:
+*   Copy the `serviceAccountKey.json` file that you downloaded from the Firebase console into firestore directory which the same directory as the `firestore_restore.js` script.
 
 3.  Obtain the backup data:
 
