@@ -10,10 +10,10 @@ Currently, two official plugins are available:
 
 Prerequisites
 Before cloning the project, ensure you have the following installed on your system:
-Git: Download and install Git
-Node.js & npm: Download and install Node.js (includes npm)
-Visual Studio Code (VS Code): Download and install VS Code
-Firebase CLI (optional for local emulation): Install Firebase CLI
+- Git: Download and install Git
+- Node.js & npm: Download and install Node.js (includes npm)
+- Visual Studio Code (VS Code): Download and install VS Code
+- Firebase CLI (optional for local emulation): Install Firebase CLI
 
 Cloning the Repository
 1.	Open VS Code.
