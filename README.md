@@ -1,21 +1,19 @@
-# React + Vite
+# TYPETYPE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a React application built with Vite, Tailwind CSS, and Firebase Firestore. It is a system about typing test.
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Prerequisites
+Before cloning the project, ensure you have the following installed:
 
+- Git (https://git-scm.com/): Download and install Git
+- Node.js (https://nodejs.org/) & npm (https://www.npmjs.com/): Download and install Node.js (includes npm)
+- Visual Studio Code (VS Code) (https://code.visualstudio.com/download): Download and install VS Code
 
-# Prerequisites
-Before cloning the project, ensure you have the following installed on your system:
-- Git: Download and install Git
-- Node.js & npm: Download and install Node.js (includes npm)
-- Visual Studio Code (VS Code): Download and install VS Code
-- Firebase CLI (optional for local emulation): Install Firebase CLI
+### Installation
 
-# Cloning the Repository
+**Clone the repository:**
 1.	Open VS Code.
 2.	Open the Terminal in VS Code (Ctrl + ~ or View > Terminal).
 3.	Navigate to the folder where you want to clone the project like <b>cd Desktop/ReactJS</b> :
@@ -31,13 +29,66 @@ git clone https://github.com/Pan630/typetype.git
 cd repository-name
 ```
 
-# Installing Dependencies
+**Installing Dependencies**
 After cloning the project, install the required dependencies:
 ```bash
 npm install
 ```
 
-# Running the Project
+## Firebase Setup
+
+### Create a Firebase Project
+
+1.  Go to the [Firebase console](https://console.firebase.google.com/).
+2.  Click "Add project" and follow the instructions to create a new project.
+3.  Once the project is created, click on the "Web" icon (</>) to add a web app to your Firebase project.
+4.  Follow the instructions to register your app and get your Firebase configuration.  You'll get a configuration object that looks something like this:
+
+    ```javascript
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    ```
+
+5.  Replace the placeholder values in `firebaseConfig` with your actual Firebase configuration. Typically, this is done in a file like `firebase.js` in firebase folder.
+
+### Firestore Restore Instructions
+
+1.  Set up your Firebase project:
+
+    *   Create a service account and download the service account key JSON file (`serviceAccountKey.json`).
+
+2.  Set the environment variable:
+
+    *   Linux/macOS: `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/firestore/serviceAccountKey.json"`
+    *   Windows: `set GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\your\firestore\serviceAccountKey.json"`
+
+3.  Obtain the backup data:
+
+    *   Download the `firestore_data.json` backup file from Google Drive().
+
+4.  Run the restore script:
+
+    *   Navigate to the project directory in your terminal.
+    *   Run: 
+    ```bash
+    node firestore_restore.js
+    ```
+
+5.  If want to export data from Firestore:
+
+    *   Navigate to the project directory in your terminal.
+    *   Run: 
+    ```bash
+    node exportFirestore.js
+    ```
+
+## Running the Project
 To start the development server, run:
 ```bash
 npm run dev
