@@ -63,7 +63,7 @@ npm install
     *   Go to Firebase Project Setting > Service accounts; create a service account and download the service account key JSON file (`serviceAccountKey.json`).
 
 2. Place the `serviceAccountKey.json` file:
-*   Copy the `serviceAccountKey.json` file that you downloaded from the Firebase console into firestore directory which the same directory as the `firestore_restore.js` script.
+    *   Copy the `serviceAccountKey.json` file that you downloaded from the Firebase console into firestore directory which the same directory as the `firestore_restore.js` script.
 
 3.  Obtain the backup data:
 
