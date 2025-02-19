@@ -18,9 +18,9 @@ Before cloning the project, ensure you have the following installed on your syst
 # Cloning the Repository
 1.	Open VS Code.
 2.	Open the Terminal in VS Code (Ctrl + ~ or View > Terminal).
-3.	Navigate to the folder where you want to clone the project like cd Desktop/ReactJS :
+3.	Navigate to the folder where you want to clone the project like <b>cd Desktop/ReactJS</b> :
 ```bash
-cd path
+cd your/file/path
 ```
 4. Clone the repository using Git:
 ```bash
@@ -34,4 +34,11 @@ cd repository-name
 # Installing Dependencies
 After cloning the project, install the required dependencies:
 ```bash
-npm install 
+npm install
+```
+
+# Running the Project
+To start the development server, run:
+```bash
+npm run dev
+```
