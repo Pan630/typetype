@@ -8,7 +8,7 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 
-<b>Prerequisites<b>
+<b>Prerequisites</b>
 Before cloning the project, ensure you have the following installed on your system:
 - Git: Download and install Git
 - Node.js & npm: Download and install Node.js (includes npm)
