@@ -8,7 +8,7 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 
-Prerequisites
+<b>Prerequisites<b>
 Before cloning the project, ensure you have the following installed on your system:
 - Git: Download and install Git
 - Node.js & npm: Download and install Node.js (includes npm)
@@ -18,4 +18,10 @@ Before cloning the project, ensure you have the following installed on your syst
 Cloning the Repository
 1.	Open VS Code.
 2.	Open the Terminal in VS Code (Ctrl + ~ or View > Terminal).
-3.	Navigate to the folder where you want to clone the project:
+3.	Navigate to the folder where you want to clone the project like cd Desktop/ReactJS :
+cd path
+4. Clone the repository using Git:
+git clone https://github.com/Pan630/typetype.git
+5. Navigate into the project folder:
+cd repository-name
+
